@@ -1,0 +1,9 @@
+name: Test Workflow
+on: [push]
+jobs:
+  test-workflow:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: twincities-os/github-actions-examples@main
+        with:
+          MODEL_VERSION: 'v1.0'

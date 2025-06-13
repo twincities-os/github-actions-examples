@@ -22,7 +22,6 @@
   },
   "dependencies": {
     "@actions/core": "^1.11.1",
-    "@swc/wasm": "^1.12.1",
-     "@swc/core": "^1.12.1"
+    "@swc/core": "^1.12.1"
   }
 }

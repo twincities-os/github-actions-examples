@@ -330,44 +330,44 @@ var require_tunnel = __commonJS({
       return agent;
     }
     function TunnelingAgent(options) {
-      var self = this;
-      self.options = options || {};
-      self.proxyOptions = self.options.proxy || {};
-      self.maxSockets = self.options.maxSockets || http.Agent.defaultMaxSockets;
-      self.requests = [];
-      self.sockets = [];
-      self.on("free", function onFree(socket, host, port, localAddress) {
+      var self2 = this;
+      self2.options = options || {};
+      self2.proxyOptions = self2.options.proxy || {};
+      self2.maxSockets = self2.options.maxSockets || http.Agent.defaultMaxSockets;
+      self2.requests = [];
+      self2.sockets = [];
+      self2.on("free", function onFree(socket, host, port, localAddress) {
         var options2 = toOptions(host, port, localAddress);
-        for (var i = 0, len = self.requests.length; i < len; ++i) {
-          var pending = self.requests[i];
+        for (var i = 0, len = self2.requests.length; i < len; ++i) {
+          var pending = self2.requests[i];
           if (pending.host === options2.host && pending.port === options2.port) {
-            self.requests.splice(i, 1);
+            self2.requests.splice(i, 1);
             pending.request.onSocket(socket);
             return;
           }
         }
         socket.destroy();
-        self.removeSocket(socket);
+        self2.removeSocket(socket);
       });
     }
     util.inherits(TunnelingAgent, events.EventEmitter);
     TunnelingAgent.prototype.addRequest = function addRequest(req, host, port, localAddress) {
-      var self = this;
-      var options = mergeOptions({ request: req }, self.options, toOptions(host, port, localAddress));
-      if (self.sockets.length >= this.maxSockets) {
-        self.requests.push(options);
+      var self2 = this;
+      var options = mergeOptions({ request: req }, self2.options, toOptions(host, port, localAddress));
+      if (self2.sockets.length >= this.maxSockets) {
+        self2.requests.push(options);
         return;
       }
-      self.createSocket(options, function(socket) {
+      self2.createSocket(options, function(socket) {
         socket.on("free", onFree);
         socket.on("close", onCloseOrRemove);
         socket.on("agentRemove", onCloseOrRemove);
         req.onSocket(socket);
         function onFree() {
-          self.emit("free", socket, options);
+          self2.emit("free", socket, options);
         }
         function onCloseOrRemove(err) {
-          self.removeSocket(socket);
+          self2.removeSocket(socket);
           socket.removeListener("free", onFree);
           socket.removeListener("close", onCloseOrRemove);
           socket.removeListener("agentRemove", onCloseOrRemove);
@@ -375,10 +375,10 @@ var require_tunnel = __commonJS({
       });
     };
     TunnelingAgent.prototype.createSocket = function createSocket(options, cb) {
-      var self = this;
+      var self2 = this;
       var placeholder = {};
-      self.sockets.push(placeholder);
-      var connectOptions = mergeOptions({}, self.proxyOptions, {
+      self2.sockets.push(placeholder);
+      var connectOptions = mergeOptions({}, self2.proxyOptions, {
         method: "CONNECT",
         path: options.host + ":" + options.port,
         agent: false,
@@ -394,7 +394,7 @@ var require_tunnel = __commonJS({
         connectOptions.headers["Proxy-Authorization"] = "Basic " + new Buffer(connectOptions.proxyAuth).toString("base64");
       }
       debug("making CONNECT request");
-      var connectReq = self.request(connectOptions);
+      var connectReq = self2.request(connectOptions);
       connectReq.useChunkedEncodingByDefault = false;
       connectReq.once("response", onResponse);
       connectReq.once("upgrade", onUpgrade);
@@ -421,7 +421,7 @@ var require_tunnel = __commonJS({
           var error = new Error("tunneling socket could not be established, statusCode=" + res.statusCode);
           error.code = "ECONNRESET";
           options.request.emit("error", error);
-          self.removeSocket(placeholder);
+          self2.removeSocket(placeholder);
           return;
         }
         if (head.length > 0) {
@@ -430,11 +430,11 @@ var require_tunnel = __commonJS({
           var error = new Error("got illegal response body from proxy");
           error.code = "ECONNRESET";
           options.request.emit("error", error);
-          self.removeSocket(placeholder);
+          self2.removeSocket(placeholder);
           return;
         }
         debug("tunneling connection has established");
-        self.sockets[self.sockets.indexOf(placeholder)] = socket;
+        self2.sockets[self2.sockets.indexOf(placeholder)] = socket;
         return cb(socket);
       }
       function onError(cause) {
@@ -447,7 +447,7 @@ var require_tunnel = __commonJS({
         var error = new Error("tunneling socket could not be established, cause=" + cause.message);
         error.code = "ECONNRESET";
         options.request.emit("error", error);
-        self.removeSocket(placeholder);
+        self2.removeSocket(placeholder);
       }
     };
     TunnelingAgent.prototype.removeSocket = function removeSocket(socket) {
@@ -464,15 +464,15 @@ var require_tunnel = __commonJS({
       }
     };
     function createSecureSocket(options, cb) {
-      var self = this;
-      TunnelingAgent.prototype.createSocket.call(self, options, function(socket) {
+      var self2 = this;
+      TunnelingAgent.prototype.createSocket.call(self2, options, function(socket) {
         var hostHeader = options.request.getHeader("host");
-        var tlsOptions = mergeOptions({}, self.options, {
+        var tlsOptions = mergeOptions({}, self2.options, {
           socket,
           servername: hostHeader ? hostHeader.replace(/:.*$/, "") : options.host
         });
         var secureSocket = tls.connect(0, tlsOptions);
-        self.sockets[self.sockets.indexOf(socket)] = secureSocket;
+        self2.sockets[self2.sockets.indexOf(socket)] = secureSocket;
         cb(secureSocket);
       });
     }
@@ -1575,7 +1575,7 @@ var require_HeaderParser = __commonJS({
     function HeaderParser(cfg) {
       EventEmitter.call(this);
       cfg = cfg || {};
-      const self = this;
+      const self2 = this;
       this.nread = 0;
       this.maxed = false;
       this.npairs = 0;
@@ -1586,18 +1586,18 @@ var require_HeaderParser = __commonJS({
       this.finished = false;
       this.ss = new StreamSearch(B_DCRLF);
       this.ss.on("info", function(isMatch, data, start, end) {
-        if (data && !self.maxed) {
-          if (self.nread + end - start >= self.maxHeaderSize) {
-            end = self.maxHeaderSize - self.nread + start;
-            self.nread = self.maxHeaderSize;
-            self.maxed = true;
+        if (data && !self2.maxed) {
+          if (self2.nread + end - start >= self2.maxHeaderSize) {
+            end = self2.maxHeaderSize - self2.nread + start;
+            self2.nread = self2.maxHeaderSize;
+            self2.maxed = true;
           } else {
-            self.nread += end - start;
+            self2.nread += end - start;
           }
-          self.buffer += data.toString("binary", start, end);
+          self2.buffer += data.toString("binary", start, end);
         }
         if (isMatch) {
-          self._finish();
+          self2._finish();
         }
       });
     }
@@ -1702,34 +1702,34 @@ var require_Dicer = __commonJS({
       this._ignoreData = false;
       this._partOpts = { highWaterMark: cfg.partHwm };
       this._pause = false;
-      const self = this;
+      const self2 = this;
       this._hparser = new HeaderParser(cfg);
       this._hparser.on("header", function(header) {
-        self._inHeader = false;
-        self._part.emit("header", header);
+        self2._inHeader = false;
+        self2._part.emit("header", header);
       });
     }
     inherits(Dicer, WritableStream);
     Dicer.prototype.emit = function(ev) {
       if (ev === "finish" && !this._realFinish) {
         if (!this._finished) {
-          const self = this;
+          const self2 = this;
           process.nextTick(function() {
-            self.emit("error", new Error("Unexpected end of multipart data"));
-            if (self._part && !self._ignoreData) {
-              const type = self._isPreamble ? "Preamble" : "Part";
-              self._part.emit("error", new Error(type + " terminated early due to unexpected end of multipart data"));
-              self._part.push(null);
+            self2.emit("error", new Error("Unexpected end of multipart data"));
+            if (self2._part && !self2._ignoreData) {
+              const type = self2._isPreamble ? "Preamble" : "Part";
+              self2._part.emit("error", new Error(type + " terminated early due to unexpected end of multipart data"));
+              self2._part.push(null);
               process.nextTick(function() {
-                self._realFinish = true;
-                self.emit("finish");
-                self._realFinish = false;
+                self2._realFinish = true;
+                self2.emit("finish");
+                self2._realFinish = false;
               });
               return;
             }
-            self._realFinish = true;
-            self.emit("finish");
-            self._realFinish = false;
+            self2._realFinish = true;
+            self2.emit("finish");
+            self2._realFinish = false;
           });
         }
       } else {
@@ -1773,10 +1773,10 @@ var require_Dicer = __commonJS({
       this._hparser = void 0;
     };
     Dicer.prototype.setBoundary = function(boundary) {
-      const self = this;
+      const self2 = this;
       this._bparser = new StreamSearch("\r\n--" + boundary);
       this._bparser.on("info", function(isMatch, data, start, end) {
-        self._oninfo(isMatch, data, start, end);
+        self2._oninfo(isMatch, data, start, end);
       });
     };
     Dicer.prototype._ignore = function() {
@@ -1788,7 +1788,7 @@ var require_Dicer = __commonJS({
     };
     Dicer.prototype._oninfo = function(isMatch, data, start, end) {
       let buf;
-      const self = this;
+      const self2 = this;
       let i = 0;
       let r;
       let shouldWriteMore = true;
@@ -1811,10 +1811,10 @@ var require_Dicer = __commonJS({
           }
           this.reset();
           this._finished = true;
-          if (self._parts === 0) {
-            self._realFinish = true;
-            self.emit("finish");
-            self._realFinish = false;
+          if (self2._parts === 0) {
+            self2._realFinish = true;
+            self2.emit("finish");
+            self2._realFinish = false;
           }
         }
         if (this._dashes) {
@@ -1827,7 +1827,7 @@ var require_Dicer = __commonJS({
       if (!this._part) {
         this._part = new PartStream(this._partOpts);
         this._part._read = function(n) {
-          self._unpause();
+          self2._unpause();
         };
         if (this._isPreamble && this.listenerCount("preamble") !== 0) {
           this.emit("preamble", this._part);
@@ -1867,13 +1867,13 @@ var require_Dicer = __commonJS({
           if (start !== end) {
             ++this._parts;
             this._part.on("end", function() {
-              if (--self._parts === 0) {
-                if (self._finished) {
-                  self._realFinish = true;
-                  self.emit("finish");
-                  self._realFinish = false;
+              if (--self2._parts === 0) {
+                if (self2._finished) {
+                  self2._realFinish = true;
+                  self2.emit("finish");
+                  self2._realFinish = false;
                 } else {
-                  self._unpause();
+                  self2._unpause();
                 }
               }
             });
@@ -2650,7 +2650,7 @@ var require_multipart = __commonJS({
     function Multipart(boy, cfg) {
       let i;
       let len;
-      const self = this;
+      const self2 = this;
       let boundary;
       const limits = cfg.limits;
       const isPartAFile = cfg.isPartAFile || ((fieldName, contentType, fileName) => contentType === "application/octet-stream" || fileName !== void 0);
@@ -2667,7 +2667,7 @@ var require_multipart = __commonJS({
       function checkFinished() {
         if (nends === 0 && finished && !boy._done) {
           finished = false;
-          self.end();
+          self2.end();
         }
       }
       if (typeof boundary !== "string") {
@@ -2700,16 +2700,16 @@ var require_multipart = __commonJS({
       };
       this.parser = new Dicer(parserCfg);
       this.parser.on("drain", function() {
-        self._needDrain = false;
-        if (self._cb && !self._pause) {
-          const cb = self._cb;
-          self._cb = void 0;
+        self2._needDrain = false;
+        if (self2._cb && !self2._pause) {
+          const cb = self2._cb;
+          self2._cb = void 0;
           cb();
         }
       }).on("part", function onPart(part) {
-        if (++self._nparts > partsLimit) {
-          self.parser.removeListener("part", onPart);
-          self.parser.on("part", skipPart);
+        if (++self2._nparts > partsLimit) {
+          self2.parser.removeListener("part", onPart);
+          self2.parser.on("part", skipPart);
           boy.hitPartsLimit = true;
           boy.emit("partsLimit");
           return skipPart(part);
@@ -2779,7 +2779,7 @@ var require_multipart = __commonJS({
             }
             ++nfiles;
             if (boy.listenerCount("file") === 0) {
-              self.parser._ignore();
+              self2.parser._ignore();
               return;
             }
             ++nends;
@@ -2787,22 +2787,22 @@ var require_multipart = __commonJS({
             curFile = file;
             file.on("end", function() {
               --nends;
-              self._pause = false;
+              self2._pause = false;
               checkFinished();
-              if (self._cb && !self._needDrain) {
-                const cb = self._cb;
-                self._cb = void 0;
+              if (self2._cb && !self2._needDrain) {
+                const cb = self2._cb;
+                self2._cb = void 0;
                 cb();
               }
             });
             file._read = function(n) {
-              if (!self._pause) {
+              if (!self2._pause) {
                 return;
               }
-              self._pause = false;
-              if (self._cb && !self._needDrain) {
-                const cb = self._cb;
-                self._cb = void 0;
+              self2._pause = false;
+              if (self2._cb && !self2._needDrain) {
+                const cb = self2._cb;
+                self2._cb = void 0;
                 cb();
               }
             };
@@ -2819,7 +2819,7 @@ var require_multipart = __commonJS({
                 file.emit("limit");
                 return;
               } else if (!file.push(data)) {
-                self._pause = true;
+                self2._pause = true;
               }
               file.bytesRead = nsize;
             };
@@ -2885,13 +2885,13 @@ var require_multipart = __commonJS({
       }
     };
     Multipart.prototype.end = function() {
-      const self = this;
-      if (self.parser.writable) {
-        self.parser.end();
-      } else if (!self._boy._done) {
+      const self2 = this;
+      if (self2.parser.writable) {
+        self2.parser.end();
+      } else if (!self2._boy._done) {
         process.nextTick(function() {
-          self._boy._done = true;
-          self._boy.emit("finish");
+          self2._boy._done = true;
+          self2._boy.emit("finish");
         });
       }
     };
@@ -9087,7 +9087,7 @@ var require_agent = __commonJS({
     var Client = require_client();
     var util = require_util();
     var createRedirectInterceptor = require_redirectInterceptor();
-    var { WeakRef: WeakRef2, FinalizationRegistry } = require_dispatcher_weakref()();
+    var { WeakRef: WeakRef2, FinalizationRegistry: FinalizationRegistry2 } = require_dispatcher_weakref()();
     var kOnConnect = Symbol("onConnect");
     var kOnDisconnect = Symbol("onDisconnect");
     var kOnConnectionError = Symbol("onConnectionError");
@@ -9120,7 +9120,7 @@ var require_agent = __commonJS({
         this[kMaxRedirections] = maxRedirections;
         this[kFactory] = factory;
         this[kClients] = /* @__PURE__ */ new Map();
-        this[kFinalizer] = new FinalizationRegistry(
+        this[kFinalizer] = new FinalizationRegistry2(
           /* istanbul ignore next: gc is undeterministic */
           (key) => {
             const ref = this[kClients].get(key);
@@ -9348,11 +9348,11 @@ var require_readable = __commonJS({
         });
       }
     };
-    function isLocked(self) {
-      return self[kBody] && self[kBody].locked === true || self[kConsume];
+    function isLocked(self2) {
+      return self2[kBody] && self2[kBody].locked === true || self2[kConsume];
     }
-    function isUnusable(self) {
-      return util.isDisturbed(self) || isLocked(self);
+    function isUnusable(self2) {
+      return util.isDisturbed(self2) || isLocked(self2);
     }
     async function consume(stream, type) {
       if (isUnusable(stream)) {
@@ -9496,40 +9496,40 @@ var require_abort_signal = __commonJS({
     var { RequestAbortedError } = require_errors();
     var kListener = Symbol("kListener");
     var kSignal = Symbol("kSignal");
-    function abort(self) {
-      if (self.abort) {
-        self.abort();
+    function abort(self2) {
+      if (self2.abort) {
+        self2.abort();
       } else {
-        self.onError(new RequestAbortedError());
+        self2.onError(new RequestAbortedError());
       }
     }
-    function addSignal(self, signal) {
-      self[kSignal] = null;
-      self[kListener] = null;
+    function addSignal(self2, signal) {
+      self2[kSignal] = null;
+      self2[kListener] = null;
       if (!signal) {
         return;
       }
       if (signal.aborted) {
-        abort(self);
+        abort(self2);
         return;
       }
-      self[kSignal] = signal;
-      self[kListener] = () => {
-        abort(self);
+      self2[kSignal] = signal;
+      self2[kListener] = () => {
+        abort(self2);
       };
-      addAbortListener(self[kSignal], self[kListener]);
+      addAbortListener(self2[kSignal], self2[kListener]);
     }
-    function removeSignal(self) {
-      if (!self[kSignal]) {
+    function removeSignal(self2) {
+      if (!self2[kSignal]) {
         return;
       }
-      if ("removeEventListener" in self[kSignal]) {
-        self[kSignal].removeEventListener("abort", self[kListener]);
+      if ("removeEventListener" in self2[kSignal]) {
+        self2[kSignal].removeEventListener("abort", self2[kListener]);
       } else {
-        self[kSignal].removeListener("abort", self[kListener]);
+        self2[kSignal].removeListener("abort", self2[kListener]);
       }
-      self[kSignal] = null;
-      self[kListener] = null;
+      self2[kSignal] = null;
+      self2[kListener] = null;
     }
     module2.exports = {
       addSignal,
@@ -12315,7 +12315,7 @@ var require_request2 = __commonJS({
     "use strict";
     var { extractBody, mixinBody, cloneBody } = require_body();
     var { Headers, fill: fillHeaders, HeadersList } = require_headers();
-    var { FinalizationRegistry } = require_dispatcher_weakref()();
+    var { FinalizationRegistry: FinalizationRegistry2 } = require_dispatcher_weakref()();
     var util = require_util();
     var {
       isValidHTTPToken,
@@ -12344,7 +12344,7 @@ var require_request2 = __commonJS({
     var { getMaxListeners, setMaxListeners, getEventListeners, defaultMaxListeners } = require("events");
     var TransformStream = globalThis.TransformStream;
     var kAbortController = Symbol("abortController");
-    var requestFinalizer = new FinalizationRegistry(({ signal, abort }) => {
+    var requestFinalizer = new FinalizationRegistry2(({ signal, abort }) => {
       signal.removeEventListener("abort", abort);
     });
     var Request = class _Request {
@@ -12389,15 +12389,15 @@ var require_request2 = __commonJS({
           signal = input[kSignal];
         }
         const origin = this[kRealm].settingsObject.origin;
-        let window = "client";
+        let window2 = "client";
         if (request.window?.constructor?.name === "EnvironmentSettingsObject" && sameOrigin(request.window, origin)) {
-          window = request.window;
+          window2 = request.window;
         }
         if (init.window != null) {
-          throw new TypeError(`'window' option '${window}' must be null`);
+          throw new TypeError(`'window' option '${window2}' must be null`);
         }
         if ("window" in init) {
-          window = "no-window";
+          window2 = "no-window";
         }
         request = makeRequest({
           // URL request’s URL.
@@ -12412,7 +12412,7 @@ var require_request2 = __commonJS({
           // client This’s relevant settings object.
           client: this[kRealm].settingsObject,
           // window window.
-          window,
+          window: window2,
           // priority request’s priority.
           priority: request.priority,
           // origin request’s origin. The propagation of the origin is only significant for navigation requests
@@ -20237,6 +20237,655 @@ var require_spack = __commonJS({
   }
 });
 
+// node_modules/.pnpm/@swc+wasm@1.12.1/node_modules/@swc/wasm/wasm.js
+var require_wasm = __commonJS({
+  "node_modules/.pnpm/@swc+wasm@1.12.1/node_modules/@swc/wasm/wasm.js"(exports2, module2) {
+    var imports = {};
+    imports["__wbindgen_placeholder__"] = module2.exports;
+    var wasm;
+    var { TextEncoder: TextEncoder2, TextDecoder: TextDecoder2 } = require("util");
+    var heap = new Array(128).fill(void 0);
+    heap.push(void 0, null, true, false);
+    function getObject(idx) {
+      return heap[idx];
+    }
+    var WASM_VECTOR_LEN = 0;
+    var cachedUint8ArrayMemory0 = null;
+    function getUint8ArrayMemory0() {
+      if (cachedUint8ArrayMemory0 === null || cachedUint8ArrayMemory0.byteLength === 0) {
+        cachedUint8ArrayMemory0 = new Uint8Array(wasm.memory.buffer);
+      }
+      return cachedUint8ArrayMemory0;
+    }
+    var cachedTextEncoder = new TextEncoder2("utf-8");
+    var encodeString = typeof cachedTextEncoder.encodeInto === "function" ? function(arg, view) {
+      return cachedTextEncoder.encodeInto(arg, view);
+    } : function(arg, view) {
+      const buf = cachedTextEncoder.encode(arg);
+      view.set(buf);
+      return {
+        read: arg.length,
+        written: buf.length
+      };
+    };
+    function passStringToWasm0(arg, malloc, realloc) {
+      if (realloc === void 0) {
+        const buf = cachedTextEncoder.encode(arg);
+        const ptr2 = malloc(buf.length, 1) >>> 0;
+        getUint8ArrayMemory0().subarray(ptr2, ptr2 + buf.length).set(buf);
+        WASM_VECTOR_LEN = buf.length;
+        return ptr2;
+      }
+      let len = arg.length;
+      let ptr = malloc(len, 1) >>> 0;
+      const mem = getUint8ArrayMemory0();
+      let offset = 0;
+      for (; offset < len; offset++) {
+        const code = arg.charCodeAt(offset);
+        if (code > 127) break;
+        mem[ptr + offset] = code;
+      }
+      if (offset !== len) {
+        if (offset !== 0) {
+          arg = arg.slice(offset);
+        }
+        ptr = realloc(ptr, len, len = offset + arg.length * 3, 1) >>> 0;
+        const view = getUint8ArrayMemory0().subarray(ptr + offset, ptr + len);
+        const ret = encodeString(arg, view);
+        offset += ret.written;
+        ptr = realloc(ptr, len, offset, 1) >>> 0;
+      }
+      WASM_VECTOR_LEN = offset;
+      return ptr;
+    }
+    var cachedDataViewMemory0 = null;
+    function getDataViewMemory0() {
+      if (cachedDataViewMemory0 === null || cachedDataViewMemory0.buffer.detached === true || cachedDataViewMemory0.buffer.detached === void 0 && cachedDataViewMemory0.buffer !== wasm.memory.buffer) {
+        cachedDataViewMemory0 = new DataView(wasm.memory.buffer);
+      }
+      return cachedDataViewMemory0;
+    }
+    var heap_next = heap.length;
+    function addHeapObject(obj) {
+      if (heap_next === heap.length) heap.push(heap.length + 1);
+      const idx = heap_next;
+      heap_next = heap[idx];
+      heap[idx] = obj;
+      return idx;
+    }
+    function handleError(f, args) {
+      try {
+        return f.apply(this, args);
+      } catch (e) {
+        wasm.__wbindgen_export_2(addHeapObject(e));
+      }
+    }
+    var cachedTextDecoder = new TextDecoder2("utf-8", { ignoreBOM: true, fatal: true });
+    cachedTextDecoder.decode();
+    function getStringFromWasm0(ptr, len) {
+      ptr = ptr >>> 0;
+      return cachedTextDecoder.decode(getUint8ArrayMemory0().subarray(ptr, ptr + len));
+    }
+    function getCachedStringFromWasm0(ptr, len) {
+      if (ptr === 0) {
+        return getObject(len);
+      } else {
+        return getStringFromWasm0(ptr, len);
+      }
+    }
+    function dropObject(idx) {
+      if (idx < 132) return;
+      heap[idx] = heap_next;
+      heap_next = idx;
+    }
+    function takeObject(idx) {
+      const ret = getObject(idx);
+      dropObject(idx);
+      return ret;
+    }
+    function isLikeNone(x) {
+      return x === void 0 || x === null;
+    }
+    var CLOSURE_DTORS = typeof FinalizationRegistry === "undefined" ? { register: () => {
+    }, unregister: () => {
+    } } : new FinalizationRegistry((state) => {
+      wasm.__wbindgen_export_4.get(state.dtor)(state.a, state.b);
+    });
+    function makeMutClosure(arg0, arg1, dtor, f) {
+      const state = { a: arg0, b: arg1, cnt: 1, dtor };
+      const real = (...args) => {
+        state.cnt++;
+        const a = state.a;
+        state.a = 0;
+        try {
+          return f(a, state.b, ...args);
+        } finally {
+          if (--state.cnt === 0) {
+            wasm.__wbindgen_export_4.get(state.dtor)(a, state.b);
+            CLOSURE_DTORS.unregister(state);
+          } else {
+            state.a = a;
+          }
+        }
+      };
+      real.original = state;
+      CLOSURE_DTORS.register(real, state, state);
+      return real;
+    }
+    function debugString(val) {
+      const type = typeof val;
+      if (type == "number" || type == "boolean" || val == null) {
+        return `${val}`;
+      }
+      if (type == "string") {
+        return `"${val}"`;
+      }
+      if (type == "symbol") {
+        const description = val.description;
+        if (description == null) {
+          return "Symbol";
+        } else {
+          return `Symbol(${description})`;
+        }
+      }
+      if (type == "function") {
+        const name = val.name;
+        if (typeof name == "string" && name.length > 0) {
+          return `Function(${name})`;
+        } else {
+          return "Function";
+        }
+      }
+      if (Array.isArray(val)) {
+        const length = val.length;
+        let debug = "[";
+        if (length > 0) {
+          debug += debugString(val[0]);
+        }
+        for (let i = 1; i < length; i++) {
+          debug += ", " + debugString(val[i]);
+        }
+        debug += "]";
+        return debug;
+      }
+      const builtInMatches = /\[object ([^\]]+)\]/.exec(toString.call(val));
+      let className;
+      if (builtInMatches && builtInMatches.length > 1) {
+        className = builtInMatches[1];
+      } else {
+        return toString.call(val);
+      }
+      if (className == "Object") {
+        try {
+          return "Object(" + JSON.stringify(val) + ")";
+        } catch (_) {
+          return "Object";
+        }
+      }
+      if (val instanceof Error) {
+        return `${val.name}: ${val.message}
+${val.stack}`;
+      }
+      return className;
+    }
+    module2.exports.minifySync = function(s, opts) {
+      try {
+        const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
+        wasm.minifySync(retptr, addHeapObject(s), addHeapObject(opts));
+        var r0 = getDataViewMemory0().getInt32(retptr + 4 * 0, true);
+        var r1 = getDataViewMemory0().getInt32(retptr + 4 * 1, true);
+        var r2 = getDataViewMemory0().getInt32(retptr + 4 * 2, true);
+        if (r2) {
+          throw takeObject(r1);
+        }
+        return takeObject(r0);
+      } finally {
+        wasm.__wbindgen_add_to_stack_pointer(16);
+      }
+    };
+    module2.exports.minify = function(s, opts) {
+      const ret = wasm.minify(addHeapObject(s), addHeapObject(opts));
+      return takeObject(ret);
+    };
+    module2.exports.parseSync = function(s, opts) {
+      try {
+        const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
+        wasm.parseSync(retptr, addHeapObject(s), addHeapObject(opts));
+        var r0 = getDataViewMemory0().getInt32(retptr + 4 * 0, true);
+        var r1 = getDataViewMemory0().getInt32(retptr + 4 * 1, true);
+        var r2 = getDataViewMemory0().getInt32(retptr + 4 * 2, true);
+        if (r2) {
+          throw takeObject(r1);
+        }
+        return takeObject(r0);
+      } finally {
+        wasm.__wbindgen_add_to_stack_pointer(16);
+      }
+    };
+    module2.exports.parse = function(s, opts) {
+      const ret = wasm.parse(addHeapObject(s), addHeapObject(opts));
+      return takeObject(ret);
+    };
+    module2.exports.printSync = function(s, opts) {
+      try {
+        const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
+        wasm.printSync(retptr, addHeapObject(s), addHeapObject(opts));
+        var r0 = getDataViewMemory0().getInt32(retptr + 4 * 0, true);
+        var r1 = getDataViewMemory0().getInt32(retptr + 4 * 1, true);
+        var r2 = getDataViewMemory0().getInt32(retptr + 4 * 2, true);
+        if (r2) {
+          throw takeObject(r1);
+        }
+        return takeObject(r0);
+      } finally {
+        wasm.__wbindgen_add_to_stack_pointer(16);
+      }
+    };
+    module2.exports.print = function(s, opts) {
+      const ret = wasm.print(addHeapObject(s), addHeapObject(opts));
+      return takeObject(ret);
+    };
+    module2.exports.transformSync = function(s, opts, experimental_plugin_bytes_resolver) {
+      try {
+        const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
+        wasm.transformSync(retptr, addHeapObject(s), addHeapObject(opts), addHeapObject(experimental_plugin_bytes_resolver));
+        var r0 = getDataViewMemory0().getInt32(retptr + 4 * 0, true);
+        var r1 = getDataViewMemory0().getInt32(retptr + 4 * 1, true);
+        var r2 = getDataViewMemory0().getInt32(retptr + 4 * 2, true);
+        if (r2) {
+          throw takeObject(r1);
+        }
+        return takeObject(r0);
+      } finally {
+        wasm.__wbindgen_add_to_stack_pointer(16);
+      }
+    };
+    module2.exports.transform = function(s, opts, experimental_plugin_bytes_resolver) {
+      const ret = wasm.transform(addHeapObject(s), addHeapObject(opts), addHeapObject(experimental_plugin_bytes_resolver));
+      return takeObject(ret);
+    };
+    function __wbg_adapter_50(arg0, arg1, arg2) {
+      wasm.__wbindgen_export_5(arg0, arg1, addHeapObject(arg2));
+    }
+    function __wbg_adapter_119(arg0, arg1, arg2, arg3) {
+      wasm.__wbindgen_export_6(arg0, arg1, addHeapObject(arg2), addHeapObject(arg3));
+    }
+    module2.exports.__wbg_String_fed4d24b68977888 = function(arg0, arg1) {
+      const ret = String(getObject(arg1));
+      const ptr1 = passStringToWasm0(ret, wasm.__wbindgen_export_0, wasm.__wbindgen_export_1);
+      const len1 = WASM_VECTOR_LEN;
+      getDataViewMemory0().setInt32(arg0 + 4 * 1, len1, true);
+      getDataViewMemory0().setInt32(arg0 + 4 * 0, ptr1, true);
+    };
+    module2.exports.__wbg_buffer_609cc3eee51ed158 = function(arg0) {
+      const ret = getObject(arg0).buffer;
+      return addHeapObject(ret);
+    };
+    module2.exports.__wbg_call_672a4d21634d4a24 = function() {
+      return handleError(function(arg0, arg1) {
+        const ret = getObject(arg0).call(getObject(arg1));
+        return addHeapObject(ret);
+      }, arguments);
+    };
+    module2.exports.__wbg_call_7cccdd69e0791ae2 = function() {
+      return handleError(function(arg0, arg1, arg2) {
+        const ret = getObject(arg0).call(getObject(arg1), getObject(arg2));
+        return addHeapObject(ret);
+      }, arguments);
+    };
+    module2.exports.__wbg_crypto_ed58b8e10a292839 = function(arg0) {
+      const ret = getObject(arg0).crypto;
+      return addHeapObject(ret);
+    };
+    module2.exports.__wbg_done_769e5ede4b31c67b = function(arg0) {
+      const ret = getObject(arg0).done;
+      return ret;
+    };
+    module2.exports.__wbg_entries_3265d4158b33e5dc = function(arg0) {
+      const ret = Object.entries(getObject(arg0));
+      return addHeapObject(ret);
+    };
+    module2.exports.__wbg_error_7534b8e9a36f1ab4 = function(arg0, arg1) {
+      var v0 = getCachedStringFromWasm0(arg0, arg1);
+      if (arg0 !== 0) {
+        wasm.__wbindgen_export_3(arg0, arg1, 1);
+      }
+      console.error(v0);
+    };
+    module2.exports.__wbg_getRandomValues_bcb4912f16000dc4 = function() {
+      return handleError(function(arg0, arg1) {
+        getObject(arg0).getRandomValues(getObject(arg1));
+      }, arguments);
+    };
+    module2.exports.__wbg_get_67b2ba62fc30de12 = function() {
+      return handleError(function(arg0, arg1) {
+        const ret = Reflect.get(getObject(arg0), getObject(arg1));
+        return addHeapObject(ret);
+      }, arguments);
+    };
+    module2.exports.__wbg_get_b9b93047fe3cf45b = function(arg0, arg1) {
+      const ret = getObject(arg0)[arg1 >>> 0];
+      return addHeapObject(ret);
+    };
+    module2.exports.__wbg_getwithrefkey_bb8f74a92cb2e784 = function(arg0, arg1) {
+      const ret = getObject(arg0)[getObject(arg1)];
+      return addHeapObject(ret);
+    };
+    module2.exports.__wbg_instanceof_ArrayBuffer_e14585432e3737fc = function(arg0) {
+      let result;
+      try {
+        result = getObject(arg0) instanceof ArrayBuffer;
+      } catch (_) {
+        result = false;
+      }
+      const ret = result;
+      return ret;
+    };
+    module2.exports.__wbg_instanceof_Uint8Array_17156bcf118086a9 = function(arg0) {
+      let result;
+      try {
+        result = getObject(arg0) instanceof Uint8Array;
+      } catch (_) {
+        result = false;
+      }
+      const ret = result;
+      return ret;
+    };
+    module2.exports.__wbg_isArray_a1eab7e0d067391b = function(arg0) {
+      const ret = Array.isArray(getObject(arg0));
+      return ret;
+    };
+    module2.exports.__wbg_isSafeInteger_343e2beeeece1bb0 = function(arg0) {
+      const ret = Number.isSafeInteger(getObject(arg0));
+      return ret;
+    };
+    module2.exports.__wbg_iterator_9a24c88df860dc65 = function() {
+      const ret = Symbol.iterator;
+      return addHeapObject(ret);
+    };
+    module2.exports.__wbg_length_a446193dc22c12f8 = function(arg0) {
+      const ret = getObject(arg0).length;
+      return ret;
+    };
+    module2.exports.__wbg_length_e2d2a49132c1b256 = function(arg0) {
+      const ret = getObject(arg0).length;
+      return ret;
+    };
+    module2.exports.__wbg_msCrypto_0a36e2ec3a343d26 = function(arg0) {
+      const ret = getObject(arg0).msCrypto;
+      return addHeapObject(ret);
+    };
+    module2.exports.__wbg_new_23a2665fac83c611 = function(arg0, arg1) {
+      try {
+        var state0 = { a: arg0, b: arg1 };
+        var cb0 = (arg02, arg12) => {
+          const a = state0.a;
+          state0.a = 0;
+          try {
+            return __wbg_adapter_119(a, state0.b, arg02, arg12);
+          } finally {
+            state0.a = a;
+          }
+        };
+        const ret = new Promise(cb0);
+        return addHeapObject(ret);
+      } finally {
+        state0.a = state0.b = 0;
+      }
+    };
+    module2.exports.__wbg_new_405e22f390576ce2 = function() {
+      const ret = new Object();
+      return addHeapObject(ret);
+    };
+    module2.exports.__wbg_new_5e0be73521bc8c17 = function() {
+      const ret = /* @__PURE__ */ new Map();
+      return addHeapObject(ret);
+    };
+    module2.exports.__wbg_new_78feb108b6472713 = function() {
+      const ret = new Array();
+      return addHeapObject(ret);
+    };
+    module2.exports.__wbg_new_8a6f238a6ece86ea = function() {
+      const ret = new Error();
+      return addHeapObject(ret);
+    };
+    module2.exports.__wbg_new_a12002a7f91c75be = function(arg0) {
+      const ret = new Uint8Array(getObject(arg0));
+      return addHeapObject(ret);
+    };
+    module2.exports.__wbg_newnoargs_105ed471475aaf50 = function(arg0, arg1) {
+      var v0 = getCachedStringFromWasm0(arg0, arg1);
+      const ret = new Function(v0);
+      return addHeapObject(ret);
+    };
+    module2.exports.__wbg_newwithbyteoffsetandlength_d97e637ebe145a9a = function(arg0, arg1, arg2) {
+      const ret = new Uint8Array(getObject(arg0), arg1 >>> 0, arg2 >>> 0);
+      return addHeapObject(ret);
+    };
+    module2.exports.__wbg_newwithlength_a381634e90c276d4 = function(arg0) {
+      const ret = new Uint8Array(arg0 >>> 0);
+      return addHeapObject(ret);
+    };
+    module2.exports.__wbg_next_25feadfc0913fea9 = function(arg0) {
+      const ret = getObject(arg0).next;
+      return addHeapObject(ret);
+    };
+    module2.exports.__wbg_next_6574e1a8a62d1055 = function() {
+      return handleError(function(arg0) {
+        const ret = getObject(arg0).next();
+        return addHeapObject(ret);
+      }, arguments);
+    };
+    module2.exports.__wbg_node_02999533c4ea02e3 = function(arg0) {
+      const ret = getObject(arg0).node;
+      return addHeapObject(ret);
+    };
+    module2.exports.__wbg_process_5c1d670bc53614b8 = function(arg0) {
+      const ret = getObject(arg0).process;
+      return addHeapObject(ret);
+    };
+    module2.exports.__wbg_queueMicrotask_97d92b4fcc8a61c5 = function(arg0) {
+      queueMicrotask(getObject(arg0));
+    };
+    module2.exports.__wbg_queueMicrotask_d3219def82552485 = function(arg0) {
+      const ret = getObject(arg0).queueMicrotask;
+      return addHeapObject(ret);
+    };
+    module2.exports.__wbg_randomFillSync_ab2cfe79ebbf2740 = function() {
+      return handleError(function(arg0, arg1) {
+        getObject(arg0).randomFillSync(takeObject(arg1));
+      }, arguments);
+    };
+    module2.exports.__wbg_require_79b1e9274cde3c87 = function() {
+      return handleError(function() {
+        const ret = module2.require;
+        return addHeapObject(ret);
+      }, arguments);
+    };
+    module2.exports.__wbg_resolve_4851785c9c5f573d = function(arg0) {
+      const ret = Promise.resolve(getObject(arg0));
+      return addHeapObject(ret);
+    };
+    module2.exports.__wbg_set_37837023f3d740e8 = function(arg0, arg1, arg2) {
+      getObject(arg0)[arg1 >>> 0] = takeObject(arg2);
+    };
+    module2.exports.__wbg_set_3f1d0b984ed272ed = function(arg0, arg1, arg2) {
+      getObject(arg0)[takeObject(arg1)] = takeObject(arg2);
+    };
+    module2.exports.__wbg_set_3fda3bac07393de4 = function(arg0, arg1, arg2) {
+      getObject(arg0)[takeObject(arg1)] = takeObject(arg2);
+    };
+    module2.exports.__wbg_set_65595bdd868b3009 = function(arg0, arg1, arg2) {
+      getObject(arg0).set(getObject(arg1), arg2 >>> 0);
+    };
+    module2.exports.__wbg_set_8fc6bf8a5b1071d1 = function(arg0, arg1, arg2) {
+      const ret = getObject(arg0).set(getObject(arg1), getObject(arg2));
+      return addHeapObject(ret);
+    };
+    module2.exports.__wbg_stack_0ed75d68575b0f3c = function(arg0, arg1) {
+      const ret = getObject(arg1).stack;
+      const ptr1 = passStringToWasm0(ret, wasm.__wbindgen_export_0, wasm.__wbindgen_export_1);
+      const len1 = WASM_VECTOR_LEN;
+      getDataViewMemory0().setInt32(arg0 + 4 * 1, len1, true);
+      getDataViewMemory0().setInt32(arg0 + 4 * 0, ptr1, true);
+    };
+    module2.exports.__wbg_static_accessor_GLOBAL_88a902d13a557d07 = function() {
+      const ret = typeof global === "undefined" ? null : global;
+      return isLikeNone(ret) ? 0 : addHeapObject(ret);
+    };
+    module2.exports.__wbg_static_accessor_GLOBAL_THIS_56578be7e9f832b0 = function() {
+      const ret = typeof globalThis === "undefined" ? null : globalThis;
+      return isLikeNone(ret) ? 0 : addHeapObject(ret);
+    };
+    module2.exports.__wbg_static_accessor_SELF_37c5d418e4bf5819 = function() {
+      const ret = typeof self === "undefined" ? null : self;
+      return isLikeNone(ret) ? 0 : addHeapObject(ret);
+    };
+    module2.exports.__wbg_static_accessor_WINDOW_5de37043a91a9c40 = function() {
+      const ret = typeof window === "undefined" ? null : window;
+      return isLikeNone(ret) ? 0 : addHeapObject(ret);
+    };
+    module2.exports.__wbg_subarray_aa9065fa9dc5df96 = function(arg0, arg1, arg2) {
+      const ret = getObject(arg0).subarray(arg1 >>> 0, arg2 >>> 0);
+      return addHeapObject(ret);
+    };
+    module2.exports.__wbg_then_44b73946d2fb3e7d = function(arg0, arg1) {
+      const ret = getObject(arg0).then(getObject(arg1));
+      return addHeapObject(ret);
+    };
+    module2.exports.__wbg_value_cd1ffa7b1ab794f1 = function(arg0) {
+      const ret = getObject(arg0).value;
+      return addHeapObject(ret);
+    };
+    module2.exports.__wbg_versions_c71aa1626a93e0a1 = function(arg0) {
+      const ret = getObject(arg0).versions;
+      return addHeapObject(ret);
+    };
+    module2.exports.__wbindgen_bigint_from_i64 = function(arg0) {
+      const ret = arg0;
+      return addHeapObject(ret);
+    };
+    module2.exports.__wbindgen_bigint_from_u64 = function(arg0) {
+      const ret = BigInt.asUintN(64, arg0);
+      return addHeapObject(ret);
+    };
+    module2.exports.__wbindgen_bigint_get_as_i64 = function(arg0, arg1) {
+      const v = getObject(arg1);
+      const ret = typeof v === "bigint" ? v : void 0;
+      getDataViewMemory0().setBigInt64(arg0 + 8 * 1, isLikeNone(ret) ? BigInt(0) : ret, true);
+      getDataViewMemory0().setInt32(arg0 + 4 * 0, !isLikeNone(ret), true);
+    };
+    module2.exports.__wbindgen_boolean_get = function(arg0) {
+      const v = getObject(arg0);
+      const ret = typeof v === "boolean" ? v ? 1 : 0 : 2;
+      return ret;
+    };
+    module2.exports.__wbindgen_cb_drop = function(arg0) {
+      const obj = takeObject(arg0).original;
+      if (obj.cnt-- == 1) {
+        obj.a = 0;
+        return true;
+      }
+      const ret = false;
+      return ret;
+    };
+    module2.exports.__wbindgen_closure_wrapper16140 = function(arg0, arg1, arg2) {
+      const ret = makeMutClosure(arg0, arg1, 637, __wbg_adapter_50);
+      return addHeapObject(ret);
+    };
+    module2.exports.__wbindgen_debug_string = function(arg0, arg1) {
+      const ret = debugString(getObject(arg1));
+      const ptr1 = passStringToWasm0(ret, wasm.__wbindgen_export_0, wasm.__wbindgen_export_1);
+      const len1 = WASM_VECTOR_LEN;
+      getDataViewMemory0().setInt32(arg0 + 4 * 1, len1, true);
+      getDataViewMemory0().setInt32(arg0 + 4 * 0, ptr1, true);
+    };
+    module2.exports.__wbindgen_error_new = function(arg0, arg1) {
+      const ret = new Error(getStringFromWasm0(arg0, arg1));
+      return addHeapObject(ret);
+    };
+    module2.exports.__wbindgen_in = function(arg0, arg1) {
+      const ret = getObject(arg0) in getObject(arg1);
+      return ret;
+    };
+    module2.exports.__wbindgen_is_bigint = function(arg0) {
+      const ret = typeof getObject(arg0) === "bigint";
+      return ret;
+    };
+    module2.exports.__wbindgen_is_function = function(arg0) {
+      const ret = typeof getObject(arg0) === "function";
+      return ret;
+    };
+    module2.exports.__wbindgen_is_null = function(arg0) {
+      const ret = getObject(arg0) === null;
+      return ret;
+    };
+    module2.exports.__wbindgen_is_object = function(arg0) {
+      const val = getObject(arg0);
+      const ret = typeof val === "object" && val !== null;
+      return ret;
+    };
+    module2.exports.__wbindgen_is_string = function(arg0) {
+      const ret = typeof getObject(arg0) === "string";
+      return ret;
+    };
+    module2.exports.__wbindgen_is_undefined = function(arg0) {
+      const ret = getObject(arg0) === void 0;
+      return ret;
+    };
+    module2.exports.__wbindgen_jsval_eq = function(arg0, arg1) {
+      const ret = getObject(arg0) === getObject(arg1);
+      return ret;
+    };
+    module2.exports.__wbindgen_jsval_loose_eq = function(arg0, arg1) {
+      const ret = getObject(arg0) == getObject(arg1);
+      return ret;
+    };
+    module2.exports.__wbindgen_memory = function() {
+      const ret = wasm.memory;
+      return addHeapObject(ret);
+    };
+    module2.exports.__wbindgen_number_get = function(arg0, arg1) {
+      const obj = getObject(arg1);
+      const ret = typeof obj === "number" ? obj : void 0;
+      getDataViewMemory0().setFloat64(arg0 + 8 * 1, isLikeNone(ret) ? 0 : ret, true);
+      getDataViewMemory0().setInt32(arg0 + 4 * 0, !isLikeNone(ret), true);
+    };
+    module2.exports.__wbindgen_number_new = function(arg0) {
+      const ret = arg0;
+      return addHeapObject(ret);
+    };
+    module2.exports.__wbindgen_object_clone_ref = function(arg0) {
+      const ret = getObject(arg0);
+      return addHeapObject(ret);
+    };
+    module2.exports.__wbindgen_object_drop_ref = function(arg0) {
+      takeObject(arg0);
+    };
+    module2.exports.__wbindgen_string_get = function(arg0, arg1) {
+      const obj = getObject(arg1);
+      const ret = typeof obj === "string" ? obj : void 0;
+      var ptr1 = isLikeNone(ret) ? 0 : passStringToWasm0(ret, wasm.__wbindgen_export_0, wasm.__wbindgen_export_1);
+      var len1 = WASM_VECTOR_LEN;
+      getDataViewMemory0().setInt32(arg0 + 4 * 1, len1, true);
+      getDataViewMemory0().setInt32(arg0 + 4 * 0, ptr1, true);
+    };
+    module2.exports.__wbindgen_string_new = function(arg0, arg1) {
+      const ret = getStringFromWasm0(arg0, arg1);
+      return addHeapObject(ret);
+    };
+    module2.exports.__wbindgen_throw = function(arg0, arg1) {
+      throw new Error(getStringFromWasm0(arg0, arg1));
+    };
+    var path = require("path").join(__dirname, "wasm_bg.wasm");
+    var bytes = require("fs").readFileSync(path);
+    var wasmModule = new WebAssembly.Module(bytes);
+    var wasmInstance = new WebAssembly.Instance(wasmModule, imports);
+    wasm = wasmInstance.exports;
+    module2.exports.__wasm = wasm;
+  }
+});
+
 // node_modules/.pnpm/@swc+core@1.12.1/node_modules/@swc/core/package.json
 var require_package = __commonJS({
   "node_modules/.pnpm/@swc+core@1.12.1/node_modules/@swc/core/package.json"(exports2, module2) {
@@ -20445,7 +21094,7 @@ var require_core2 = __commonJS({
         assert.ok(triple, "Failed to read target triple from native binary.");
         return binding;
       } catch (_) {
-        fallbackBindings = require("@swc/wasm");
+        fallbackBindings = require_wasm();
       } finally {
         return binding;
       }

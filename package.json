@@ -6,7 +6,7 @@
     ".": "./dist/index.js"
   },
   "scripts": {
-    "build": "esbuild src/index.ts --bundle --platform=node --outfile=dist/index.js --loader:.node=file --external:@swc/wasm",
+    "build": "esbuild src/index.ts --bundle --platform=node --outfile=dist/index.js --loader:.node=file",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -15,13 +15,14 @@
   "description": "",
   "devDependencies": {
     "@biomejs/biome": "^1.9.4",
+    "@swc/core": "^1.12.1",
     "@types/node": "^22.15.3",
     "esbuild": "^0.25.4",
-    "@swc/core": "^1.12.1",
     "tsx": "^4.19.4",
     "typescript": "^5.8.3"
   },
   "dependencies": {
-    "@actions/core": "^1.11.1"
+    "@actions/core": "^1.11.1",
+    "@swc/wasm": "^1.12.1"
   }
 }

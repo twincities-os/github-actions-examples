@@ -6,7 +6,7 @@
     ".": "./dist/index.js"
   },
   "scripts": {
-    "build": "esbuild src/index.ts --bundle --platform=node --outfile=dist/index.js",
+    "build": "esbuild src/index.ts --bundle --platform=node --outfile=dist/index.js --loader:.node=file --external:@swc/wasm",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],

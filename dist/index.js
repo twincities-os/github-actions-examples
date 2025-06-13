@@ -19808,11 +19808,983 @@ Support boolean input list: \`true | True | TRUE | false | False | FALSE\``);
   }
 });
 
+// node_modules/.pnpm/@swc+core-darwin-arm64@1.12.1/node_modules/@swc/core-darwin-arm64/swc.darwin-arm64.node
+var require_swc_darwin_arm64 = __commonJS({
+  "node_modules/.pnpm/@swc+core-darwin-arm64@1.12.1/node_modules/@swc/core-darwin-arm64/swc.darwin-arm64.node"(exports2, module2) {
+    module2.exports = "./swc.darwin-arm64-MVISHF2Q.node";
+  }
+});
+
+// node_modules/.pnpm/@swc+core@1.12.1/node_modules/@swc/core/binding.js
+var require_binding = __commonJS({
+  "node_modules/.pnpm/@swc+core@1.12.1/node_modules/@swc/core/binding.js"(exports2, module2) {
+    var { readFileSync } = require("fs");
+    var nativeBinding = null;
+    var loadErrors = [];
+    var isMusl = () => {
+      let musl = false;
+      if (process.platform === "linux") {
+        musl = isMuslFromFilesystem();
+        if (musl === null) {
+          musl = isMuslFromReport();
+        }
+        if (musl === null) {
+          musl = isMuslFromChildProcess();
+        }
+      }
+      return musl;
+    };
+    var isFileMusl = (f) => f.includes("libc.musl-") || f.includes("ld-musl-");
+    var isMuslFromFilesystem = () => {
+      try {
+        return readFileSync("/usr/bin/ldd", "utf-8").includes("musl");
+      } catch {
+        return null;
+      }
+    };
+    var isMuslFromReport = () => {
+      const report = typeof process.report.getReport === "function" ? process.report.getReport() : null;
+      if (!report) {
+        return null;
+      }
+      if (report.header && report.header.glibcVersionRuntime) {
+        return false;
+      }
+      if (Array.isArray(report.sharedObjects)) {
+        if (report.sharedObjects.some(isFileMusl)) {
+          return true;
+        }
+      }
+      return false;
+    };
+    var isMuslFromChildProcess = () => {
+      try {
+        return require("child_process").execSync("ldd --version", { encoding: "utf8" }).includes("musl");
+      } catch (e) {
+        return false;
+      }
+    };
+    function requireNative() {
+      if (process.platform === "android") {
+        if (process.arch === "arm64") {
+          try {
+            return require("./swc.android-arm64.node");
+          } catch (e) {
+            loadErrors.push(e);
+          }
+          try {
+            return require("@swc/core-android-arm64");
+          } catch (e) {
+            loadErrors.push(e);
+          }
+        } else if (process.arch === "arm") {
+          try {
+            return require("./swc.android-arm-eabi.node");
+          } catch (e) {
+            loadErrors.push(e);
+          }
+          try {
+            return require("@swc/core-android-arm-eabi");
+          } catch (e) {
+            loadErrors.push(e);
+          }
+        } else {
+          loadErrors.push(new Error(`Unsupported architecture on Android ${process.arch}`));
+        }
+      } else if (process.platform === "win32") {
+        if (process.arch === "x64") {
+          try {
+            return require("./swc.win32-x64-msvc.node");
+          } catch (e) {
+            loadErrors.push(e);
+          }
+          try {
+            return require("@swc/core-win32-x64-msvc");
+          } catch (e) {
+            loadErrors.push(e);
+          }
+        } else if (process.arch === "ia32") {
+          try {
+            return require("./swc.win32-ia32-msvc.node");
+          } catch (e) {
+            loadErrors.push(e);
+          }
+          try {
+            return require("@swc/core-win32-ia32-msvc");
+          } catch (e) {
+            loadErrors.push(e);
+          }
+        } else if (process.arch === "arm64") {
+          try {
+            return require("./swc.win32-arm64-msvc.node");
+          } catch (e) {
+            loadErrors.push(e);
+          }
+          try {
+            return require("@swc/core-win32-arm64-msvc");
+          } catch (e) {
+            loadErrors.push(e);
+          }
+        } else {
+          loadErrors.push(new Error(`Unsupported architecture on Windows: ${process.arch}`));
+        }
+      } else if (process.platform === "darwin") {
+        try {
+          return require("./swc.darwin-universal.node");
+        } catch (e) {
+          loadErrors.push(e);
+        }
+        try {
+          return require("@swc/core-darwin-universal");
+        } catch (e) {
+          loadErrors.push(e);
+        }
+        if (process.arch === "x64") {
+          try {
+            return require("./swc.darwin-x64.node");
+          } catch (e) {
+            loadErrors.push(e);
+          }
+          try {
+            return require("@swc/core-darwin-x64");
+          } catch (e) {
+            loadErrors.push(e);
+          }
+        } else if (process.arch === "arm64") {
+          try {
+            return require("./swc.darwin-arm64.node");
+          } catch (e) {
+            loadErrors.push(e);
+          }
+          try {
+            return require_swc_darwin_arm64();
+          } catch (e) {
+            loadErrors.push(e);
+          }
+        } else {
+          loadErrors.push(new Error(`Unsupported architecture on macOS: ${process.arch}`));
+        }
+      } else if (process.platform === "freebsd") {
+        if (process.arch === "x64") {
+          try {
+            return require("./swc.freebsd-x64.node");
+          } catch (e) {
+            loadErrors.push(e);
+          }
+          try {
+            return require("@swc/core-freebsd-x64");
+          } catch (e) {
+            loadErrors.push(e);
+          }
+        } else if (process.arch === "arm64") {
+          try {
+            return require("./swc.freebsd-arm64.node");
+          } catch (e) {
+            loadErrors.push(e);
+          }
+          try {
+            return require("@swc/core-freebsd-arm64");
+          } catch (e) {
+            loadErrors.push(e);
+          }
+        } else {
+          loadErrors.push(new Error(`Unsupported architecture on FreeBSD: ${process.arch}`));
+        }
+      } else if (process.platform === "linux") {
+        if (process.arch === "x64") {
+          if (isMusl()) {
+            try {
+              return require("./swc.linux-x64-musl.node");
+            } catch (e) {
+              loadErrors.push(e);
+            }
+            try {
+              return require("@swc/core-linux-x64-musl");
+            } catch (e) {
+              loadErrors.push(e);
+            }
+          } else {
+            try {
+              return require("./swc.linux-x64-gnu.node");
+            } catch (e) {
+              loadErrors.push(e);
+            }
+            try {
+              return require("@swc/core-linux-x64-gnu");
+            } catch (e) {
+              loadErrors.push(e);
+            }
+          }
+        } else if (process.arch === "arm64") {
+          if (isMusl()) {
+            try {
+              return require("./swc.linux-arm64-musl.node");
+            } catch (e) {
+              loadErrors.push(e);
+            }
+            try {
+              return require("@swc/core-linux-arm64-musl");
+            } catch (e) {
+              loadErrors.push(e);
+            }
+          } else {
+            try {
+              return require("./swc.linux-arm64-gnu.node");
+            } catch (e) {
+              loadErrors.push(e);
+            }
+            try {
+              return require("@swc/core-linux-arm64-gnu");
+            } catch (e) {
+              loadErrors.push(e);
+            }
+          }
+        } else if (process.arch === "arm") {
+          try {
+            return require("./swc.linux-arm-gnueabihf.node");
+          } catch (e) {
+            loadErrors.push(e);
+          }
+          try {
+            return require("@swc/core-linux-arm-gnueabihf");
+          } catch (e) {
+            loadErrors.push(e);
+          }
+        } else if (process.arch === "riscv64") {
+          if (isMusl()) {
+            try {
+              return require("./swc.linux-riscv64-musl.node");
+            } catch (e) {
+              loadErrors.push(e);
+            }
+            try {
+              return require("@swc/core-linux-riscv64-musl");
+            } catch (e) {
+              loadErrors.push(e);
+            }
+          } else {
+            try {
+              return require("./swc.linux-riscv64-gnu.node");
+            } catch (e) {
+              loadErrors.push(e);
+            }
+            try {
+              return require("@swc/core-linux-riscv64-gnu");
+            } catch (e) {
+              loadErrors.push(e);
+            }
+          }
+        } else if (process.arch === "s390x") {
+          try {
+            return require("./swc.linux-s390x-gnu.node");
+          } catch (e) {
+            loadErrors.push(e);
+          }
+          try {
+            return require("@swc/core-linux-s390x-gnu");
+          } catch (e) {
+            loadErrors.push(e);
+          }
+        } else {
+          loadErrors.push(new Error(`Unsupported architecture on Linux: ${process.arch}`));
+        }
+      } else {
+        loadErrors.push(new Error(`Unsupported OS: ${process.platform}, architecture: ${process.arch}`));
+      }
+    }
+    nativeBinding = requireNative();
+    if (!nativeBinding || process.env.NAPI_RS_FORCE_WASI) {
+      try {
+        nativeBinding = require("./swc.wasi.cjs");
+      } catch (err) {
+        if (process.env.NAPI_RS_FORCE_WASI) {
+          console.error(err);
+        }
+      }
+      if (!nativeBinding) {
+        try {
+          nativeBinding = require("@swc/core-wasm32-wasi");
+        } catch (err) {
+          if (process.env.NAPI_RS_FORCE_WASI) {
+            console.error(err);
+          }
+        }
+      }
+    }
+    if (!nativeBinding) {
+      if (loadErrors.length > 0) {
+        throw new Error("Failed to load native binding", { cause: loadErrors });
+      }
+      throw new Error(`Failed to load native binding`);
+    }
+    module2.exports.Compiler = nativeBinding.Compiler;
+    module2.exports.JsCompiler = nativeBinding.JsCompiler;
+    module2.exports.analyze = nativeBinding.analyze;
+    module2.exports.bundle = nativeBinding.bundle;
+    module2.exports.getTargetTriple = nativeBinding.getTargetTriple;
+    module2.exports.initCustomTraceSubscriber = nativeBinding.initCustomTraceSubscriber;
+    module2.exports.minify = nativeBinding.minify;
+    module2.exports.minifySync = nativeBinding.minifySync;
+    module2.exports.newMangleNameCache = nativeBinding.newMangleNameCache;
+    module2.exports.parse = nativeBinding.parse;
+    module2.exports.parseFile = nativeBinding.parseFile;
+    module2.exports.parseFileSync = nativeBinding.parseFileSync;
+    module2.exports.parseSync = nativeBinding.parseSync;
+    module2.exports.print = nativeBinding.print;
+    module2.exports.printSync = nativeBinding.printSync;
+    module2.exports.transform = nativeBinding.transform;
+    module2.exports.transformFile = nativeBinding.transformFile;
+    module2.exports.transformFileSync = nativeBinding.transformFileSync;
+    module2.exports.transformSync = nativeBinding.transformSync;
+  }
+});
+
+// node_modules/.pnpm/@swc+core@1.12.1/node_modules/@swc/core/spack.js
+var require_spack = __commonJS({
+  "node_modules/.pnpm/@swc+core@1.12.1/node_modules/@swc/core/spack.js"(exports2) {
+    "use strict";
+    var __createBinding = exports2 && exports2.__createBinding || (Object.create ? function(o, m, k, k2) {
+      if (k2 === void 0) k2 = k;
+      var desc = Object.getOwnPropertyDescriptor(m, k);
+      if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+        desc = { enumerable: true, get: function() {
+          return m[k];
+        } };
+      }
+      Object.defineProperty(o, k2, desc);
+    } : function(o, m, k, k2) {
+      if (k2 === void 0) k2 = k;
+      o[k2] = m[k];
+    });
+    var __setModuleDefault = exports2 && exports2.__setModuleDefault || (Object.create ? function(o, v) {
+      Object.defineProperty(o, "default", { enumerable: true, value: v });
+    } : function(o, v) {
+      o["default"] = v;
+    });
+    var __importStar = exports2 && exports2.__importStar || function(mod) {
+      if (mod && mod.__esModule) return mod;
+      var result = {};
+      if (mod != null) {
+        for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+      }
+      __setModuleDefault(result, mod);
+      return result;
+    };
+    var __awaiter = exports2 && exports2.__awaiter || function(thisArg, _arguments, P, generator) {
+      function adopt(value) {
+        return value instanceof P ? value : new P(function(resolve) {
+          resolve(value);
+        });
+      }
+      return new (P || (P = Promise))(function(resolve, reject) {
+        function fulfilled(value) {
+          try {
+            step(generator.next(value));
+          } catch (e) {
+            reject(e);
+          }
+        }
+        function rejected(value) {
+          try {
+            step(generator["throw"](value));
+          } catch (e) {
+            reject(e);
+          }
+        }
+        function step(result) {
+          result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected);
+        }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+      });
+    };
+    Object.defineProperty(exports2, "__esModule", { value: true });
+    exports2.config = exports2.compileBundleOptions = exports2.isLocalFile = void 0;
+    var path = __importStar(require("path"));
+    exports2.isLocalFile = /^\.{0,2}\//;
+    function compileBundleOptions(config2) {
+      return __awaiter(this, void 0, void 0, function* () {
+        const f = config2 === void 0 ? "." : config2;
+        try {
+          const filepath = typeof f === "string" ? f : "spack.config.js";
+          const fileModule = exports2.isLocalFile.test(filepath) ? path.resolve(filepath) : filepath;
+          let configFromFile = require(fileModule);
+          if (configFromFile.default) {
+            configFromFile = configFromFile.default;
+          }
+          if (Array.isArray(configFromFile)) {
+            if (Array.isArray(f)) {
+              return [...configFromFile, ...f];
+            }
+            if (typeof f !== "string") {
+              configFromFile.push(f);
+            }
+            return configFromFile;
+          }
+          return Object.assign(Object.assign({}, configFromFile), typeof config2 === "string" ? {} : config2);
+        } catch (e) {
+          if (typeof f === "string") {
+            throw new Error(`Error occurred while loading config file at ${config2}: ${e}`);
+          }
+          return f;
+        }
+      });
+    }
+    exports2.compileBundleOptions = compileBundleOptions;
+    function config(c) {
+      return c;
+    }
+    exports2.config = config;
+  }
+});
+
+// node_modules/.pnpm/@swc+core@1.12.1/node_modules/@swc/core/package.json
+var require_package = __commonJS({
+  "node_modules/.pnpm/@swc+core@1.12.1/node_modules/@swc/core/package.json"(exports2, module2) {
+    module2.exports = {
+      name: "@swc/core",
+      version: "1.12.1",
+      description: "Super-fast alternative for babel",
+      homepage: "https://swc.rs",
+      main: "./index.js",
+      author: "\uAC15\uB3D9\uC724 <kdy1997.dev@gmail.com>",
+      license: "Apache-2.0",
+      keywords: [
+        "swc",
+        "swcpack",
+        "babel",
+        "typescript",
+        "rust",
+        "webpack",
+        "tsc"
+      ],
+      engines: {
+        node: ">=10"
+      },
+      repository: {
+        type: "git",
+        url: "git+https://github.com/swc-project/swc.git"
+      },
+      bugs: {
+        url: "https://github.com/swc-project/swc/issues"
+      },
+      napi: {
+        binaryName: "swc",
+        targets: [
+          "x86_64-apple-darwin",
+          "x86_64-pc-windows-msvc",
+          "x86_64-unknown-linux-gnu",
+          "x86_64-unknown-linux-musl",
+          "i686-pc-windows-msvc",
+          "armv7-unknown-linux-gnueabihf",
+          "aarch64-apple-darwin",
+          "aarch64-unknown-linux-gnu",
+          "aarch64-unknown-linux-musl",
+          "aarch64-pc-windows-msvc"
+        ]
+      },
+      publishConfig: {
+        registry: "https://registry.npmjs.org/",
+        access: "public"
+      },
+      types: "./index.d.ts",
+      scripts: {
+        postinstall: "node postinstall.js",
+        artifacts: "napi artifacts --npm-dir scripts/npm",
+        prepack: "tsc -d && napi prepublish -p scripts/npm --tag-style npm && node scripts/copy-readme.js",
+        pack: "wasm-pack",
+        "build:ts": "tsc -d",
+        "build:wasm": 'npm-run-all "pack -- build ../../bindings/binding_core_wasm --scope swc {1} -t {2} --features plugin" --',
+        build: "tsc -d && napi build --manifest-path ../../bindings/Cargo.toml --platform -p binding_core_node --js ./binding.js --dts ./binding.d.ts --release -o .",
+        "build:dev": "tsc -d && napi build --manifest-path ../../bindings/Cargo.toml --platform -p binding_core_node --js ./binding.js --dts ./binding.d.ts -o .",
+        test: "cross-env NODE_OPTIONS='--experimental-vm-modules ${NODE_OPTIONS}' jest --config ./jest.config.js",
+        version: "napi version --npm-dir scripts/npm"
+      },
+      peerDependencies: {
+        "@swc/helpers": ">=0.5.17"
+      },
+      peerDependenciesMeta: {
+        "@swc/helpers": {
+          optional: true
+        }
+      },
+      funding: {
+        type: "opencollective",
+        url: "https://opencollective.com/swc"
+      },
+      files: [
+        "CHANGELOG.md",
+        "Visitor.d.ts",
+        "index.d.ts",
+        "spack.js",
+        "util.d.ts",
+        "LICENSE",
+        "Visitor.js",
+        "binding.d.ts",
+        "index.js",
+        "types.d.ts",
+        "util.js",
+        "README.md",
+        "binding.js",
+        "package.json",
+        "spack.d.ts",
+        "types.js",
+        "postinstall.js",
+        "bindings/binding_core_wasm/pkg/binding_core_wasm.d.ts"
+      ],
+      dependencies: {
+        "@swc/counter": "^0.1.3",
+        "@swc/types": "^0.1.23"
+      },
+      devDependencies: {
+        "@napi-rs/cli": "^3.0.0-alpha.43",
+        "cross-env": "^7.0.3",
+        jest: "^29.7.0",
+        typescript: "^5.3.3"
+      },
+      optionalDependencies: {
+        "@swc/core-darwin-x64": "1.12.1",
+        "@swc/core-win32-x64-msvc": "1.12.1",
+        "@swc/core-linux-x64-gnu": "1.12.1",
+        "@swc/core-linux-x64-musl": "1.12.1",
+        "@swc/core-win32-ia32-msvc": "1.12.1",
+        "@swc/core-linux-arm-gnueabihf": "1.12.1",
+        "@swc/core-darwin-arm64": "1.12.1",
+        "@swc/core-linux-arm64-gnu": "1.12.1",
+        "@swc/core-linux-arm64-musl": "1.12.1",
+        "@swc/core-win32-arm64-msvc": "1.12.1"
+      }
+    };
+  }
+});
+
+// node_modules/.pnpm/@swc+core@1.12.1/node_modules/@swc/core/index.js
+var require_core2 = __commonJS({
+  "node_modules/.pnpm/@swc+core@1.12.1/node_modules/@swc/core/index.js"(exports2) {
+    "use strict";
+    var __createBinding = exports2 && exports2.__createBinding || (Object.create ? function(o, m, k, k2) {
+      if (k2 === void 0) k2 = k;
+      var desc = Object.getOwnPropertyDescriptor(m, k);
+      if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+        desc = { enumerable: true, get: function() {
+          return m[k];
+        } };
+      }
+      Object.defineProperty(o, k2, desc);
+    } : function(o, m, k, k2) {
+      if (k2 === void 0) k2 = k;
+      o[k2] = m[k];
+    });
+    var __setModuleDefault = exports2 && exports2.__setModuleDefault || (Object.create ? function(o, v) {
+      Object.defineProperty(o, "default", { enumerable: true, value: v });
+    } : function(o, v) {
+      o["default"] = v;
+    });
+    var __importStar = exports2 && exports2.__importStar || function(mod) {
+      if (mod && mod.__esModule) return mod;
+      var result = {};
+      if (mod != null) {
+        for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+      }
+      __setModuleDefault(result, mod);
+      return result;
+    };
+    var __awaiter = exports2 && exports2.__awaiter || function(thisArg, _arguments, P, generator) {
+      function adopt(value) {
+        return value instanceof P ? value : new P(function(resolve) {
+          resolve(value);
+        });
+      }
+      return new (P || (P = Promise))(function(resolve, reject) {
+        function fulfilled(value) {
+          try {
+            step(generator.next(value));
+          } catch (e) {
+            reject(e);
+          }
+        }
+        function rejected(value) {
+          try {
+            step(generator["throw"](value));
+          } catch (e) {
+            reject(e);
+          }
+        }
+        function step(result) {
+          result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected);
+        }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+      });
+    };
+    var __rest = exports2 && exports2.__rest || function(s, e) {
+      var t = {};
+      for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0)
+        t[p] = s[p];
+      if (s != null && typeof Object.getOwnPropertySymbols === "function")
+        for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
+          if (e.indexOf(p[i]) < 0 && Object.prototype.propertyIsEnumerable.call(s, p[i]))
+            t[p[i]] = s[p[i]];
+        }
+      return t;
+    };
+    Object.defineProperty(exports2, "__esModule", { value: true });
+    exports2.DEFAULT_EXTENSIONS = exports2.getBinaryMetadata = exports2.__experimental_registerGlobalTraceConfig = exports2.minifySync = exports2.minify = exports2.bundle = exports2.transformFileSync = exports2.transformFile = exports2.transformSync = exports2.transform = exports2.printSync = exports2.print = exports2.parseFileSync = exports2.parseFile = exports2.parseSync = exports2.parse = exports2.experimental_analyze = exports2.Compiler = exports2.plugins = exports2.version = exports2.experimental_newMangleNameCache = void 0;
+    var path_1 = require("path");
+    var binding_1 = require_binding();
+    Object.defineProperty(exports2, "experimental_newMangleNameCache", { enumerable: true, get: function() {
+      return binding_1.newMangleNameCache;
+    } });
+    var spack_1 = require_spack();
+    var assert = __importStar(require("assert"));
+    var bindingsOverride = process.env["SWC_BINARY_PATH"];
+    var fallbackBindings;
+    var bindings = (() => {
+      let binding;
+      try {
+        binding = !!bindingsOverride ? require((0, path_1.resolve)(bindingsOverride)) : require_binding();
+        const triple = binding.getTargetTriple();
+        assert.ok(triple, "Failed to read target triple from native binary.");
+        return binding;
+      } catch (_) {
+        fallbackBindings = require("@swc/wasm");
+      } finally {
+        return binding;
+      }
+    })();
+    exports2.version = require_package().version;
+    function plugins(ps) {
+      return (mod) => {
+        let m = mod;
+        for (const p of ps) {
+          m = p(m);
+        }
+        return m;
+      };
+    }
+    exports2.plugins = plugins;
+    var Compiler = class {
+      constructor() {
+        this.fallbackBindingsPluginWarningDisplayed = false;
+      }
+      minify(src, opts, extras) {
+        return __awaiter(this, void 0, void 0, function* () {
+          if (bindings) {
+            return bindings.minify(toBuffer(src), toBuffer(opts !== null && opts !== void 0 ? opts : {}), extras !== null && extras !== void 0 ? extras : {});
+          } else if (fallbackBindings) {
+            return fallbackBindings.minify(src, opts);
+          }
+          throw new Error("Bindings not found.");
+        });
+      }
+      minifySync(src, opts, extras) {
+        if (bindings) {
+          return bindings.minifySync(toBuffer(src), toBuffer(opts !== null && opts !== void 0 ? opts : {}), extras !== null && extras !== void 0 ? extras : {});
+        } else if (fallbackBindings) {
+          return fallbackBindings.minifySync(src, opts);
+        }
+        throw new Error("Bindings not found.");
+      }
+      parse(src, options, filename) {
+        return __awaiter(this, void 0, void 0, function* () {
+          options = options || { syntax: "ecmascript" };
+          options.syntax = options.syntax || "ecmascript";
+          if (!bindings && !!fallbackBindings) {
+            throw new Error("Fallback bindings does not support this interface yet.");
+          } else if (!bindings) {
+            throw new Error("Bindings not found.");
+          }
+          if (bindings) {
+            const res = yield bindings.parse(src, toBuffer(options), filename);
+            return JSON.parse(res);
+          } else if (fallbackBindings) {
+            return fallbackBindings.parse(src, options);
+          }
+          throw new Error("Bindings not found.");
+        });
+      }
+      parseSync(src, options, filename) {
+        options = options || { syntax: "ecmascript" };
+        options.syntax = options.syntax || "ecmascript";
+        if (bindings) {
+          return JSON.parse(bindings.parseSync(src, toBuffer(options), filename));
+        } else if (fallbackBindings) {
+          return fallbackBindings.parseSync(src, options);
+        }
+        throw new Error("Bindings not found.");
+      }
+      parseFile(path, options) {
+        return __awaiter(this, void 0, void 0, function* () {
+          options = options || { syntax: "ecmascript" };
+          options.syntax = options.syntax || "ecmascript";
+          if (!bindings && !!fallbackBindings) {
+            throw new Error("Fallback bindings does not support filesystem access.");
+          } else if (!bindings) {
+            throw new Error("Bindings not found.");
+          }
+          const res = yield bindings.parseFile(path, toBuffer(options));
+          return JSON.parse(res);
+        });
+      }
+      parseFileSync(path, options) {
+        options = options || { syntax: "ecmascript" };
+        options.syntax = options.syntax || "ecmascript";
+        if (!bindings && !!fallbackBindings) {
+          throw new Error("Fallback bindings does not support filesystem access");
+        } else if (!bindings) {
+          throw new Error("Bindings not found.");
+        }
+        return JSON.parse(bindings.parseFileSync(path, toBuffer(options)));
+      }
+      /**
+       * Note: this method should be invoked on the compiler instance used
+       *  for `parse()` / `parseSync()`.
+       */
+      print(m, options) {
+        return __awaiter(this, void 0, void 0, function* () {
+          options = options || {};
+          if (bindings) {
+            return bindings.print(JSON.stringify(m), toBuffer(options));
+          } else if (fallbackBindings) {
+            return fallbackBindings.print(m, options);
+          }
+          throw new Error("Bindings not found.");
+        });
+      }
+      /**
+       * Note: this method should be invoked on the compiler instance used
+       *  for `parse()` / `parseSync()`.
+       */
+      printSync(m, options) {
+        options = options || {};
+        if (bindings) {
+          return bindings.printSync(JSON.stringify(m), toBuffer(options));
+        } else if (fallbackBindings) {
+          return fallbackBindings.printSync(m, options);
+        }
+        throw new Error("Bindings not found.");
+      }
+      transform(src, options) {
+        var _a, _b, _c;
+        return __awaiter(this, void 0, void 0, function* () {
+          const isModule = typeof src !== "string";
+          options = options || {};
+          if ((_a = options === null || options === void 0 ? void 0 : options.jsc) === null || _a === void 0 ? void 0 : _a.parser) {
+            options.jsc.parser.syntax = (_b = options.jsc.parser.syntax) !== null && _b !== void 0 ? _b : "ecmascript";
+          }
+          const { plugin } = options, newOptions = __rest(options, ["plugin"]);
+          if (bindings) {
+            if (plugin) {
+              const m = typeof src === "string" ? yield this.parse(src, (_c = options === null || options === void 0 ? void 0 : options.jsc) === null || _c === void 0 ? void 0 : _c.parser, options.filename) : src;
+              return this.transform(plugin(m), newOptions);
+            }
+            return bindings.transform(isModule ? JSON.stringify(src) : src, isModule, toBuffer(newOptions));
+          } else if (fallbackBindings) {
+            if (plugin && !this.fallbackBindingsPluginWarningDisplayed) {
+              console.warn(`Fallback bindings does not support legacy plugins, it'll be ignored.`);
+              this.fallbackBindingsPluginWarningDisplayed = true;
+            }
+            return fallbackBindings.transform(src, options);
+          }
+          throw new Error("Bindings not found.");
+        });
+      }
+      transformSync(src, options) {
+        var _a, _b, _c;
+        const isModule = typeof src !== "string";
+        options = options || {};
+        if ((_a = options === null || options === void 0 ? void 0 : options.jsc) === null || _a === void 0 ? void 0 : _a.parser) {
+          options.jsc.parser.syntax = (_b = options.jsc.parser.syntax) !== null && _b !== void 0 ? _b : "ecmascript";
+        }
+        const { plugin } = options, newOptions = __rest(options, ["plugin"]);
+        if (bindings) {
+          if (plugin) {
+            const m = typeof src === "string" ? this.parseSync(src, (_c = options === null || options === void 0 ? void 0 : options.jsc) === null || _c === void 0 ? void 0 : _c.parser, options.filename) : src;
+            return this.transformSync(plugin(m), newOptions);
+          }
+          return bindings.transformSync(isModule ? JSON.stringify(src) : src, isModule, toBuffer(newOptions));
+        } else if (fallbackBindings) {
+          if (plugin && !this.fallbackBindingsPluginWarningDisplayed) {
+            console.warn(`Fallback bindings does not support legacy plugins, it'll be ignored.`);
+            this.fallbackBindingsPluginWarningDisplayed = true;
+          }
+          return fallbackBindings.transformSync(isModule ? JSON.stringify(src) : src, options);
+        }
+        throw new Error("Bindings not found");
+      }
+      transformFile(path, options) {
+        var _a, _b, _c;
+        return __awaiter(this, void 0, void 0, function* () {
+          if (!bindings && !!fallbackBindings) {
+            throw new Error("Fallback bindings does not support filesystem access.");
+          } else if (!bindings) {
+            throw new Error("Bindings not found.");
+          }
+          options = options || {};
+          if ((_a = options === null || options === void 0 ? void 0 : options.jsc) === null || _a === void 0 ? void 0 : _a.parser) {
+            options.jsc.parser.syntax = (_b = options.jsc.parser.syntax) !== null && _b !== void 0 ? _b : "ecmascript";
+          }
+          const { plugin } = options, newOptions = __rest(options, ["plugin"]);
+          newOptions.filename = path;
+          if (plugin) {
+            const m = yield this.parseFile(path, (_c = options === null || options === void 0 ? void 0 : options.jsc) === null || _c === void 0 ? void 0 : _c.parser);
+            return this.transform(plugin(m), newOptions);
+          }
+          return bindings.transformFile(path, false, toBuffer(newOptions));
+        });
+      }
+      transformFileSync(path, options) {
+        var _a, _b, _c;
+        if (!bindings && !!fallbackBindings) {
+          throw new Error("Fallback bindings does not support filesystem access.");
+        } else if (!bindings) {
+          throw new Error("Bindings not found.");
+        }
+        options = options || {};
+        if ((_a = options === null || options === void 0 ? void 0 : options.jsc) === null || _a === void 0 ? void 0 : _a.parser) {
+          options.jsc.parser.syntax = (_b = options.jsc.parser.syntax) !== null && _b !== void 0 ? _b : "ecmascript";
+        }
+        const { plugin } = options, newOptions = __rest(options, ["plugin"]);
+        newOptions.filename = path;
+        if (plugin) {
+          const m = this.parseFileSync(path, (_c = options === null || options === void 0 ? void 0 : options.jsc) === null || _c === void 0 ? void 0 : _c.parser);
+          return this.transformSync(plugin(m), newOptions);
+        }
+        return bindings.transformFileSync(
+          path,
+          /* isModule */
+          false,
+          toBuffer(newOptions)
+        );
+      }
+      bundle(options) {
+        return __awaiter(this, void 0, void 0, function* () {
+          if (!bindings && !!fallbackBindings) {
+            throw new Error("Fallback bindings does not support this interface yet.");
+          } else if (!bindings) {
+            throw new Error("Bindings not found.");
+          }
+          const opts = yield (0, spack_1.compileBundleOptions)(options);
+          if (Array.isArray(opts)) {
+            const all = yield Promise.all(opts.map((opt) => __awaiter(this, void 0, void 0, function* () {
+              return this.bundle(opt);
+            })));
+            let obj = {};
+            for (const o of all) {
+              obj = Object.assign(Object.assign({}, obj), o);
+            }
+            return obj;
+          }
+          return bindings.bundle(toBuffer(Object.assign({}, opts)));
+        });
+      }
+    };
+    exports2.Compiler = Compiler;
+    var compiler = new Compiler();
+    function experimental_analyze(src, options) {
+      return bindings.analyze(src, toBuffer(options));
+    }
+    exports2.experimental_analyze = experimental_analyze;
+    function parse(src, options) {
+      return compiler.parse(src, options);
+    }
+    exports2.parse = parse;
+    function parseSync2(src, options) {
+      return compiler.parseSync(src, options);
+    }
+    exports2.parseSync = parseSync2;
+    function parseFile(path, options) {
+      return compiler.parseFile(path, options);
+    }
+    exports2.parseFile = parseFile;
+    function parseFileSync(path, options) {
+      return compiler.parseFileSync(path, options);
+    }
+    exports2.parseFileSync = parseFileSync;
+    function print(m, options) {
+      return compiler.print(m, options);
+    }
+    exports2.print = print;
+    function printSync(m, options) {
+      return compiler.printSync(m, options);
+    }
+    exports2.printSync = printSync;
+    function transform(src, options) {
+      return compiler.transform(src, options);
+    }
+    exports2.transform = transform;
+    function transformSync(src, options) {
+      return compiler.transformSync(src, options);
+    }
+    exports2.transformSync = transformSync;
+    function transformFile(path, options) {
+      return compiler.transformFile(path, options);
+    }
+    exports2.transformFile = transformFile;
+    function transformFileSync(path, options) {
+      return compiler.transformFileSync(path, options);
+    }
+    exports2.transformFileSync = transformFileSync;
+    function bundle(options) {
+      return compiler.bundle(options);
+    }
+    exports2.bundle = bundle;
+    function minify(src, opts, extras) {
+      return __awaiter(this, void 0, void 0, function* () {
+        return compiler.minify(src, opts, extras);
+      });
+    }
+    exports2.minify = minify;
+    function minifySync(src, opts, extras) {
+      return compiler.minifySync(src, opts, extras);
+    }
+    exports2.minifySync = minifySync;
+    function __experimental_registerGlobalTraceConfig(traceConfig) {
+      if (bindings) {
+        if (traceConfig.type === "traceEvent") {
+          bindings.initCustomTraceSubscriber(traceConfig.fileName);
+        }
+      }
+    }
+    exports2.__experimental_registerGlobalTraceConfig = __experimental_registerGlobalTraceConfig;
+    function getBinaryMetadata() {
+      return {
+        target: bindings ? bindings === null || bindings === void 0 ? void 0 : bindings.getTargetTriple() : void 0
+      };
+    }
+    exports2.getBinaryMetadata = getBinaryMetadata;
+    exports2.DEFAULT_EXTENSIONS = Object.freeze([
+      ".js",
+      ".jsx",
+      ".es6",
+      ".es",
+      ".mjs",
+      ".ts",
+      ".tsx",
+      ".cts",
+      ".mts"
+    ]);
+    function toBuffer(t) {
+      return Buffer.from(JSON.stringify(t));
+    }
+  }
+});
+
 // src/index.ts
 var core = __toESM(require_core());
+var import_core = __toESM(require_core2());
 async function main() {
   const modelVersion = core.getInput("MODEL_VERSION");
   console.log(`The model version is: ${modelVersion}`);
+  const sourceCode = `import * as core from "@actions/core";
+async function main() {
+	const modelVersion = core.getInput("MODEL_VERSION");
+}
+main();`;
+  const ast = (0, import_core.parseSync)(sourceCode, {
+    syntax: "typescript",
+    tsx: false
+  });
+  console.log("--------- HERE IS YOUR AST --------------");
+  console.log(JSON.stringify(ast));
 }
 main();
 /*! Bundled license information:
